@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'contact_person',
+        'role',
         'password'
     ];
 
@@ -49,8 +50,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function client()
+    public function clients()
     {
-        return $this->hasOne(Client::class);
+        return $this->hasMany(Client::class);
     }
 }

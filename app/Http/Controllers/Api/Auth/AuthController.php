@@ -17,16 +17,15 @@ class AuthController extends Controller
 
         $request->validate([
             'name'  => 'required',
-            'email' => 'required|email|max:255|unique:users',
-            'contact_person' => 'required|numeric|min:6',
+            'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'contact_person' => $request->contact_person,
             'password' => Hash::make($request->password),
+            'role'     => 'freelancer',
         ]);
 
         return response()->json([
@@ -58,6 +57,8 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
+            'message' => 'Login Successfully',
+            'code'    => 201,
             'token_type' => 'bearer',
             'token' => $token,
             'data' => new LoginResource($user),
