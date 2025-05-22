@@ -23,4 +23,13 @@ class TimeLogs extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    // Accessor to calculate hours dynamically
+    public function getHoursAttribute()
+    {
+        if ($this->start_time && $this->end_time) {
+            return round((strtotime($this->end_time) - strtotime($this->start_time)) / 3600, 2);
+        }
+        return 0;
+    }
 }

@@ -29,8 +29,23 @@ class TimeLogsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'start_time' => 'required|date',
+            'end_time' => 'nullable|date|after_or_equal:start_time',
+            'description' => 'nullable|string',
+        ]);
+
+        $log = TimeLogs::create($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Time log created',
+            'data' => $log->load('project'),
+            'hours' => $log->hours,
+        ]);
     }
+
 
     /**
      * Display the specified resource.

@@ -88,7 +88,12 @@ class ClientController extends Controller
         $updated = $client->update($request->only(['name', 'email', 'contact_person']));
 
         if (!$updated) {
-            return response()->json(['status' => false, 'message' => 'Client not updated.'], 500);
+            return response()->json([
+                'status' => false,
+                 'message' => 'Client not updated.',
+                 'code' => 500,
+                 'data' => null,
+                ], 500);
         }
 
         return response()->json([
