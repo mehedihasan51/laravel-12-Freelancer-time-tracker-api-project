@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\Project;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\Client\ClientResource;
 
 class ProjectResource extends JsonResource
 {
@@ -15,11 +16,12 @@ class ProjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'client_id'     => $this->client_id,
+            // 'client_id'     => $this->client_id,
             'title'           => $this->title,
             'description'     => $this->description,
             'status'          => $this->status,
             'deadline'        => $this->deadline,
+            'client'          => new ClientResource($this->whenLoaded('client')),
         ];
     }
 }

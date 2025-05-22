@@ -11,18 +11,25 @@ use App\Http\Controllers\Api\TimeLogs\TimeLogsController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::post('/register',[AuthController::class,'register']);
-Route::post('/login',[AuthController::class,'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 // After Login
-Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::apiResource('/clients', ClientController::class);
     Route::apiResource('/project', ProjectController::class);
     Route::apiResource('/timelog', TimeLogsController::class);
-   
+
 });
-//  Route::put('clients/update/{id}', [ClientController::class,'update']);
-//  Route::post('clients/update/{id}', ClientController::class,'store');
+Route::prefix('time-logs')->group(function () {
+    Route::post('/start', [TimeLogsController::class, 'startLog']);
+    // Route::post('/timelog', [TimeLogsController::class, 'store']);
+    Route::post('/end/{id}', [TimeLogsController::class, 'endLog']);
+    Route::post('/manual', [TimeLogsController::class, 'manualLog']);
+    Route::get('/', [TimeLogsController::class, 'index']);
+});
+
+Route::get('/report', [TimeLogsController::class, 'report']);

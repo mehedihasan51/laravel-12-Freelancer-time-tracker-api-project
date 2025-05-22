@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\Projects;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Client\ClientResource;
 use App\Http\Resources\Api\Project\ProjectResource;
 
 class ProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * List all projects for a specific freelancer (based on authenticated user's clients)
      */
     public function index(Request $request)
     {
@@ -20,16 +22,10 @@ class ProjectController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $projects
+            'message' => 'Projects retrieved successfully',
+            'code' => 200,
+            'data' => ProjectResource::collection($projects),
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -55,30 +51,25 @@ class ProjectController extends Controller
             'message' => 'Project created successfully',
             'code' => 201,
             'data' => new ProjectResource($project)
-        ],201);
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    // Show a single project
     public function show($id)
     {
         $project = Project::with('client')->findOrFail($id);
 
         return response()->json([
             'status' => true,
-            'data' => $project
+            'message' => 'Project retrieved successfully',
+            'code' => 200,
+            'data' => new ProjectResource($project),
+            
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Project $project)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -104,7 +95,8 @@ class ProjectController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Project updated successfully',
-            'data' => $project
+            'code' => 200,
+            'data' => new ProjectResource($project)
         ]);
     }
 
@@ -125,7 +117,9 @@ class ProjectController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Project deleted successfully'
+            'message' => 'Project deleted successfully',
+            'code' => 200,
+            'data' => null
         ]);
     }
 }
