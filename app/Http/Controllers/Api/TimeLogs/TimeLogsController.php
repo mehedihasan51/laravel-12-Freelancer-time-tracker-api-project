@@ -81,7 +81,8 @@ class TimeLogsController extends Controller
             'status' => true,
             'message' => 'Log ended successfully',
             'code' => 200,
-            'data' => new TimeLogEndResource($log)]);
+            'data' => new TimeLogEndResource($log)
+        ]);
     }
 
     /**
@@ -91,16 +92,14 @@ class TimeLogsController extends Controller
 
     public function manualLog(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'project_id' => 'required|exists:projects,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'description' => 'nullable|string',
         ]);
 
-        $hours = round(Carbon::parse($validated['end_time'])->diffInMinutes($validated['start_time']) / 60, 2);
-
-        $log = TimeLogs::create([...$validated, 'hours' => $hours]);
+         $log = TimeLogs::create($data);
 
         return response()->json([
             'status' => true,
@@ -109,9 +108,7 @@ class TimeLogsController extends Controller
             'data' => new TimeLogResource($log),
             'hours' => $log->hours,
         ]);
-            
     }
-
 
     /**
      * Report filtering by client/project/day
