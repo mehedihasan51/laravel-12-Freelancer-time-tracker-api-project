@@ -12,6 +12,7 @@ class TimeLogs extends Model
 
     protected $fillable = [
         'project_id',
+        'client_id',
         'start_time',
         'end_time',
         'hours',
@@ -19,9 +20,16 @@ class TimeLogs extends Model
         'description',
     ];
 
+    // protected $fillable = ['user_id', 'client_id', 'project_id', 'date', 'hours'];
+
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
     }
 
     // Accessor to calculate hours dynamically

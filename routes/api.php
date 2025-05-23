@@ -32,4 +32,4 @@ Route::prefix('time-logs')->group(function () {
     Route::get('/', [TimeLogsController::class, 'index']);
 });
 
-Route::get('/report', [TimeLogsController::class, 'report']);
+Route::get('/report', [TimeLogsController::class, 'getReport']);
