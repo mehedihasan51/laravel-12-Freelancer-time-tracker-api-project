@@ -1,4 +1,4 @@
-@extends('frontend.app') {{-- Assuming you have a main layout called "app.blade.php" --}}
+@extends('frontend.app')
 
 @section('title', 'Freelancer Login')
 
