@@ -9,6 +9,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\TimeLog\TimeLogEndResource;
 use App\Http\Resources\Api\TimeLog\TimeLogResource;
 use App\Http\Resources\Api\TimeLog\TimeLogStartResource;
+use Illuminate\Support\Facades\Cache;
+use App\Notifications\DailyLimitReachedNotification;
+use Illuminate\Support\Facades\Notification;
 
 class TimeLogsController extends Controller
 {
@@ -36,6 +39,7 @@ class TimeLogsController extends Controller
             'code' => 200,
             'total_hours' => $query->sum('hours'),
             'logs' => TimeLogResource::collection($query->get())
+
         ]);
     }
 
@@ -44,27 +48,87 @@ class TimeLogsController extends Controller
      * Start a time log
      */
 
+    // public function startLog(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'project_id' => 'required|exists:projects,id',
+    //         'client_id' => 'required|exists:clients,id',
+    //     ]);
+
+    //     $log = TimeLogs::create([
+    //         'project_id' => $validated['project_id'],
+    //         'client_id' => $validated['client_id'],
+    //         'start_time' => now(),
+    //         'description' => 'Started log',
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Log started successfully',
+    //         'code' => 200,
+    //         'data' => new TimeLogStartResource($log)
+    //     ]);
+
+
+    //     if ($total >= 8 && !$alreadySent) {
+    //        Notification::route('mail', auth()->user()->email)
+    //     ->notify(new DailyLimitReachedNotification($total));
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Daily limit reached, notification sent',
+    //             'code' => 200,
+    //             'data' => new TimeLogStartResource($log)
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Log started successfully',
+    //             'code' => 200,
+    //             'data' => new TimeLogStartResource($log)
+    //         ]);
+    //     }
+    // }
+
+
     public function startLog(Request $request)
     {
         $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'client_id' => 'required|exists:clients,id',
+            'project_id' => 'required',
+            'client_id' => 'required',
         ]);
 
-        $log = TimeLogs::create([
+        $log = [
             'project_id' => $validated['project_id'],
             'client_id' => $validated['client_id'],
             'start_time' => now(),
             'description' => 'Started log',
-        ]);
+        ];
+        $total = 8; 
+        $userId = auth()->id();
+        $dateKey = now()->toDateString();
+        $cacheKey = "notified_{$userId}_{$dateKey}";
+
+        if ($total >= 8 && !Cache::has($cacheKey)) {
+            Notification::route('mail', auth()->user()->email)
+                ->notify(new DailyLimitReachedNotification($total));
+            Cache::put($cacheKey, true, now()->endOfDay());
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Daily limit reached, notification sent',
+                'code' => 200,
+                'data' => $log
+            ]);
+        }
 
         return response()->json([
             'status' => true,
             'message' => 'Log started successfully',
             'code' => 200,
-            'data' => new TimeLogStartResource($log)
+            'data' => $log
         ]);
     }
+
 
     /**
      * End a time log
@@ -131,26 +195,21 @@ class TimeLogsController extends Controller
             'project_id' => 'nullable|integer',
         ]);
 
-        // Build the base query
         $query = TimeLogs::with('project.client')
             ->whereBetween('start_time', [
                 $request->from,
                 $request->to,
             ]);
 
-        // If they passed client_id, narrow to that client's logs
         if ($request->client_id) {
             $query->where('client_id', $request->client_id);
         }
-
-        // Optional project filter
         if ($request->project_id) {
             $query->where('project_id', $request->project_id);
         }
 
         $logs = $query->get();
 
-        // If they asked for a specific client and got no logs, return false
         if ($request->client_id && $logs->isEmpty()) {
             return response()->json([
                 'status'  => false,
@@ -158,8 +217,6 @@ class TimeLogsController extends Controller
                 'code'    => 404,
             ], 404);
         }
-
-        // If they didn’t filter by client but there are simply no logs at all
         if (! $request->client_id && $logs->isEmpty()) {
             return response()->json([
                 'status'  => false,
@@ -167,8 +224,6 @@ class TimeLogsController extends Controller
                 'code'    => 404,
             ], 404);
         }
-
-        // Compute your metrics
         $perDay = $logs
             ->groupBy(fn($log) => Carbon::parse($log->start_time)->toDateString())
             ->count();
