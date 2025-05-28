@@ -28,10 +28,22 @@ class AuthController extends Controller
             'role'     => 'freelancer',
         ]);
 
+        $user = User::where('email', $request->email)->firstOrFail();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $data = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'token' => $token,
+        ];
+
         return response()->json([
             'status'     => true,
-            'message'    => 'User logged in successfully.',
+            'message'    => 'User Register in successfully.',
             'code'       => 200,
+            'data' => $data,
         ]);
     }
 
