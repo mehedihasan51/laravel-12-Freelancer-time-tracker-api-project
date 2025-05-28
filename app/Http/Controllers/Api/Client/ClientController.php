@@ -9,21 +9,6 @@ use App\Http\Resources\Api\Client\ClientResource;
 
 class ClientController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -46,21 +31,6 @@ class ClientController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Client $client)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Client $client)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -76,7 +46,6 @@ class ClientController extends Controller
 
         $client = Client::findOrFail($id);
 
-        // Check if the authenticated user owns this client
         if ($request->user()->id !== $client->user_id) {
             return response()->json([
                 'status' => false,
@@ -84,7 +53,6 @@ class ClientController extends Controller
             ], 403);
         }
 
-        // Update only the retrieved client
         $updated = $client->update($request->only(['name', 'email', 'contact_person']));
 
         if (!$updated) {
@@ -104,15 +72,4 @@ class ClientController extends Controller
         ]);
     }
 
-
-
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Client $client)
-    {
-        //
-    }
 }

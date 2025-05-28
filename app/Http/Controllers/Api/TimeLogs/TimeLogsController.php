@@ -48,47 +48,6 @@ class TimeLogsController extends Controller
      * Start a time log
      */
 
-    // public function startLog(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'project_id' => 'required|exists:projects,id',
-    //         'client_id' => 'required|exists:clients,id',
-    //     ]);
-
-    //     $log = TimeLogs::create([
-    //         'project_id' => $validated['project_id'],
-    //         'client_id' => $validated['client_id'],
-    //         'start_time' => now(),
-    //         'description' => 'Started log',
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Log started successfully',
-    //         'code' => 200,
-    //         'data' => new TimeLogStartResource($log)
-    //     ]);
-
-
-    //     if ($total >= 8 && !$alreadySent) {
-    //        Notification::route('mail', auth()->user()->email)
-    //     ->notify(new DailyLimitReachedNotification($total));
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Daily limit reached, notification sent',
-    //             'code' => 200,
-    //             'data' => new TimeLogStartResource($log)
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Log started successfully',
-    //             'code' => 200,
-    //             'data' => new TimeLogStartResource($log)
-    //         ]);
-    //     }
-    // }
-
 
     public function startLog(Request $request)
     {

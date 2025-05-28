@@ -41,7 +41,7 @@ class ProjectController extends Controller
             'deadline'    => 'nullable|date',
         ]);
 
-        // Ensure the client belongs to the authenticated user
+       
         $client = $request->user()->clients()->findOrFail($data['client_id']);
 
         $project = Project::create($data);
@@ -78,7 +78,7 @@ class ProjectController extends Controller
     {
         $project = Project::findOrFail($id);
 
-        // Ensure the project belongs to the user's client
+    
         if ($request->user()->id !== $project->client->user_id) {
             return response()->json(['status' => false, 'message' => 'Unauthorized'], 403);
         }
@@ -104,7 +104,7 @@ class ProjectController extends Controller
      * Remove the specified resource from storage.
      */
 
-    // Delete a project
+   
     public function destroy(Request $request, $id)
     {
         $project = Project::findOrFail($id);
